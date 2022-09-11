@@ -16,6 +16,9 @@
   "author": "Jaan Javed",
   "license": "UNLICENSED",
   "dependencies": {
+    "pino": "^8.5.0",
+    "pino-http": "^8.2.0",
+    "pino-pretty": "^9.1.0",
     "prettier": "^2.7.1"
   },
   "devDependencies": {
