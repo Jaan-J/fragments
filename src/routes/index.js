@@ -9,7 +9,7 @@ const { version, author } = require('../../package.json');
 const router = express.Router();
 
 // Our authorization middleware
-const { authenticate } = require('../authentication');
+const { authenticate } = require('../authorization/index');
 /**
  * Expose all of our API routes on /v1/* to include an API version.
  */
@@ -27,7 +27,7 @@ router.get('/', (req, res) => {
     status: 'ok',
     author,
     // Use your own GitHub URL for this...
-    githubUrl: 'https://github.com/jaan-j/fragments',
+    githubUrl: 'https://github.com/Jaan-J/fragments',
     version,
   });
 });
