@@ -1,4 +1,6 @@
 node_modules/
 
+coverage/
+
 # Don't include .env, which might have sensitive information
 .env
