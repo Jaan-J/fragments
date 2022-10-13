@@ -22,7 +22,26 @@ class Fragment {
     this.updated = updated || new Date();
     this.type = type;
     this.size = size;
-    // TODO
+
+    if(!ownerId){
+      throw new Error('No owner id provided');
+    }
+
+    if(!type){
+      throw new Error('No type provided');
+    }
+
+    if(typeof size !== 'number'){
+      throw new Error('Size is not a number');
+    }
+
+    if(size < 0){
+      throw new Error('Size is less than 0');
+    }
+
+    if(!Fragment.isSupportedType(type)){
+      throw new Error('Type is not supported');
+    }
   }
 
   /**
@@ -37,7 +56,6 @@ class Fragment {
         return Promise.all(fragments.map(f => Fragment.byId(ownerId, f)));
       }
       return listFragments(ownerId);
-    // TODO
   }
 
   /**
@@ -47,7 +65,6 @@ class Fragment {
    * @returns Promise<Fragment>
    */
   static async byId(ownerId, id) {
-    // TODO
     const fragment = await readFragment(ownerId, id);
     return new Fragment(fragment);
   }
@@ -59,7 +76,6 @@ class Fragment {
    * @returns Promise
    */
   static delete(ownerId, id){
-    // TODO
     return deleteFragment(ownerId, id);
   }
 
@@ -68,8 +84,8 @@ class Fragment {
    * @returns Promise
    */
   save() {
-    // TODO
-    return writeFragment(this.ownerId, this.id, this);
+    this.updated = new Date().toISOString();
+    return writeFragment(this);
   }
 
   /**
@@ -77,7 +93,6 @@ class Fragment {
    * @returns Promise<Buffer>
    */
   getData() {
-    // TODO
     return readFragmentData(this.ownerId, this.id);
   }
 
@@ -87,8 +102,8 @@ class Fragment {
    * @returns Promise
    */
   async setData(data) {
-    // TODO
     this.size = data.length;
+    this.updated = new Date().toISOString();
     await writeFragmentData(this.ownerId, this.id, data);
   }
 
@@ -107,7 +122,6 @@ class Fragment {
    * @returns {boolean} true if fragment's type is text/*
    */
   get isText() {
-    // TODO
     if(this.mimeType.startsWith('text/')){
       return true;
     }
@@ -119,9 +133,8 @@ class Fragment {
    * @returns {Array<string>} list of supported mime types
    */
   get formats() {
-    // TODO
     if(this.isText){
-      return ['text/html', 'text/plain'];
+      return ['text/plain'];
     }
     return [];
   }
@@ -132,9 +145,8 @@ class Fragment {
    * @returns {boolean} true if we support this Content-Type (i.e., type/subtype)
    */
   static isSupportedType(value) {
-    // TODO
     const { type } = contentType.parse(value);
-    if(type.startsWith('text/plain')){
+    if(type === 'text/plain'){
       return true;
     }
     return false;
