@@ -7,12 +7,6 @@ const contentType = require('content-type');
 const { Fragment } = require('../../model/fragment.js');
 const express = require('express');
 
-// Create a router on which to mount our API endpoints
-const router = express.Router();
-
-// Define our first route, which will be: GET /v1/fragments
-router.get('/fragments', require('./get'));
-
 const rawBody = () =>
   express.raw({
     inflate: true,
@@ -26,7 +20,15 @@ const rawBody = () =>
     },
   });
 
+// Create a router on which to mount our API endpoints
+const router = express.Router();
+
+// Define our first route, which will be: GET /v1/fragments
+router.get('/fragments', require('./get'));
+
+// Other routes will go here later on...
+router.get('/fragments/:id', require('./get'));
 // Use a raw body parser for POST, which will give a `Buffer` Object or `{}` at `req.body`
 router.post('/fragments', rawBody(), require('./post'));
-// Other routes will go here later on...
+
 module.exports = router;

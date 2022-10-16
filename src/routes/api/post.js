@@ -24,6 +24,7 @@ module.exports = async (req, res) => {
     res.status(201).json(
       createSuccessResponse({
         Location: API_URL,
+        "id": fragments.id,
         'Content-Type': type,
         'Content-Length': req.body.length,
       })
