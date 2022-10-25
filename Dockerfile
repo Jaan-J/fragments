@@ -1,5 +1,6 @@
 #Docker file setup for the fragments container
-FROM node:16.15.1
+FROM node:16.15.1-bullseye-slim
+ENV NODE_ENV production
 
 LABEL maintainer="Jaan Javed <jjaved3@myseneca.ca>"
 LABEL description="Fragments node.js microservice"
@@ -19,13 +20,15 @@ WORKDIR /app
 
 COPY package*.json /app/
 
-RUN npm install
+RUN npm ci --only=production
 
 # Copy src/
 COPY ./src ./src
 
 # Copy our HTPASSWD file
 COPY ./tests/.htpasswd ./tests/.htpasswd
+
+USER node
 
 # Run the server
 CMD npm start
