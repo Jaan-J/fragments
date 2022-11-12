@@ -117,12 +117,20 @@ class Fragment {
     return type;
   }
 
+
   /**
    * Returns true if this fragment is a text/* mime type
    * @returns {boolean} true if fragment's type is text/*
    */
   get isText() {
     if(this.mimeType.startsWith('text/')){
+      return true;
+    }
+    return false;
+  }
+
+  get isMarkdown(){
+    if(this.mimeType === 'text/markdown'){
       return true;
     }
     return false;
@@ -136,6 +144,9 @@ class Fragment {
     if(this.isText){
       return ['text/plain'];
     }
+    if (this.isMarkdown) {
+      return ['text/html'];
+    }
     return [];
   }
 
@@ -146,7 +157,7 @@ class Fragment {
    */
   static isSupportedType(value) {
     const { type } = contentType.parse(value);
-    if(type === 'text/plain'){
+    if(type === 'text/plain'|| type === 'text/plain; charset=utf-8' || type === 'text/markdown' || type === 'text/html' || type === 'application/json'){
       return true;
     }
     return false;
