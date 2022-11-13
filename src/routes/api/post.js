@@ -16,6 +16,7 @@ module.exports = async (req, res) => {
     created: new Date().toISOString(),
     updated: new Date().toISOString(),
     size: req.body.length,
+    data: req.body.toString(),
   };
 
   const fragments = new Fragment(metadata);
@@ -24,7 +25,7 @@ module.exports = async (req, res) => {
     res.status(201).json(
       createSuccessResponse({
         Location: API_URL,
-        "id": fragments.id,
+        id: fragments.id,
         'Content-Type': type,
         'Content-Length': req.body.length,
       })
