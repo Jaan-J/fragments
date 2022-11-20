@@ -66,13 +66,20 @@ module.exports = (req, res) => {
     }
     try {
       Fragment.byId(req.user, req.params.id).then((fragment) => {
-        res.send(
-          createSuccessResponse({
-            'Content-Type': fragment.type,
-            'Content-Length': fragment.size,
-            data: fragment.data.toString(),
-          })
-        );
+        // set the header content type to the fragment type
+        const fragData = fragment.data.toString();
+        res.set({
+          'Content-Type': fragment.type,
+          'Content-Length': fragment.size,
+        });
+        res.status(200).send(fragData);
+        // res.send(
+        //   createSuccessResponse({
+        //     'Content-Type': fragment.type,
+        //     'Content-Length': fragment.size,
+        //     data: fragment.data.toString(),
+        //   })
+        // );
       });
     } catch (err) {
       res.status(404).json(createErrorResponse(err));
