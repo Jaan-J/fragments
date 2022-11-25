@@ -1,7 +1,7 @@
 // src/routes/api/get-id-info.js
 const { createSuccessResponse, createErrorResponse } = require('../../response');
+const { Fragment } = require('../../model/fragment');
 const logger = require('../../logger');
-const {Fragment} = require('../../model/fragment');
 
 module.exports = async (req, res) => {
   try {

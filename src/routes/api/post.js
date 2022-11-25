@@ -1,11 +1,11 @@
-const contentType = require('content-type');
-const { Fragment } = require('../../model/fragment.js');
 const { createSuccessResponse, createErrorResponse } = require('../../response');
+const { Fragment } = require('../../model/fragment.js');
+const contentType = require('content-type');
 
 const API_URL = process.env.API_URL || 'http://localhost:8080';
 
 // Support sending various Content-Types on the body up to 5M in size
-module.exports =  (req, res) => {
+module.exports = (req, res) => {
   const { type } = contentType.parse(req);
   if (Object.keys(req.body).length === 0) {
     //check to see if type is supported
@@ -26,6 +26,7 @@ module.exports =  (req, res) => {
   };
   const fragments = new Fragment(metadata);
   fragments.save();
+  fragments.setData(req.body);
   if (Buffer.isBuffer(req.body)) {
     res.location(`${API_URL}/v1/fragments/${fragments.id}`);
     res.status(201).json(
@@ -36,7 +37,7 @@ module.exports =  (req, res) => {
           type: fragments.type,
           size: fragments.size,
           created: fragments.created,
-          updated: fragments.updated
+          updated: fragments.updated,
         },
       })
     );
