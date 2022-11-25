@@ -37,6 +37,7 @@
     "pino-http": "^8.2.0",
     "pino-pretty": "^9.1.0",
     "prettier": "^2.7.1",
+    "sharp": "^0.31.2",
     "stoppable": "^1.1.0"
   },
   "devDependencies": {
