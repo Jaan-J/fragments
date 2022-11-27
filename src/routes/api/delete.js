@@ -6,9 +6,9 @@ const logger = require('../../logger');
 module.exports = async (req, res) => {
   try {
     logger.debug({ ownerId: req.user, Id: req.params.id }, 'DELETE /fragments/:id');
-    Fragment.delete(req.user, req.params.id);
+    await Fragment.delete(req.user, req.params.id);
     res.status(200).json(createSuccessResponse());
   } catch (error) {
-    res.status(404).json(createErrorResponse(500, error.message));
+    res.status(404).json(createErrorResponse(404, error.message));
   }
 };
