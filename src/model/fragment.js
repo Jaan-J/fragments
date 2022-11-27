@@ -12,7 +12,7 @@ const {
   writeFragmentData,
   listFragments,
   deleteFragment,
-} = require('./data/memory');
+} = require('./data');
 
 const validTypes = {
   txt: 'text/plain',
@@ -185,7 +185,7 @@ class Fragment {
   static isSupportedExt(value) {
     return Object.keys(validTypes).includes(value);
   }
-  
+
   static extValidType(ext) {
     return validTypes[ext];
   }
