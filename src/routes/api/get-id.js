@@ -21,11 +21,12 @@ module.exports = async (req, res) => {
         }
         res.set({
           'Content-Type': 'text/html',
-          'Content-Length': fragment.size,
         })
         res.status(200).json(createSuccessResponse({
           fragment: {
-            htmlRender
+            // 'Content-Type': 'text/html',
+            'Content-Length': fragment.size,
+            data : htmlRender
           }
         }));
       return;
