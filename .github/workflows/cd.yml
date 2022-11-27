@@ -91,6 +91,7 @@ jobs:
          AWS_COGNITO_POOL_ID=us-east-1_UujwPVln3
          AWS_COGNITO_CLIENT_ID=3ov8tf0k6dc2dj9fck22bl8nii
          PORT=8080
+         AWS_S3_BUCKET_NAME=jjaved3-fragments
 
 
     - name: Deploy Amazon ECS task definition
