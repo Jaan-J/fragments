@@ -31,6 +31,7 @@ jobs:
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
+
   # NOTE: ending and restarting the Learner Lab will void these secrets,
   # update them if you are doing this during a new session:
   # `Error: The security token included in the request is expired`
@@ -69,3 +70,33 @@ jobs:
         push: true
         # Use the git tag version and `latest`
         tags: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPO }}:${{ env.VERSION_TAG }}, ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPO }}:latest
+
+
+    - name: Fill in the new image ID in the Amazon ECS task definition
+      id: update-task-def
+      uses: aws-actions/amazon-ecs-render-task-definition@v1
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPO: fragments
+        VERSION_TAG: ${{ github.ref_name }}
+      with:
+        task-definition: fragments-definition.json
+        container-name: fragments
+        # Use the image we just built and pushed to ECR for this tag
+        image: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPO }}:${{ env.VERSION_TAG }}
+        environment-variables: |
+         LOG_LEVEL=info
+         NODE_ENV=production
+         API_URL=http://EC2Co-EcsEl-1CL255R0HE7HV-266276072.us-east-1.elb.amazonaws.com:8080/
+         AWS_COGNITO_POOL_ID=us-east-1_UujwPVln3
+         AWS_COGNITO_CLIENT_ID=3ov8tf0k6dc2dj9fck22bl8nii
+         PORT=8080
+
+
+    - name: Deploy Amazon ECS task definition
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      with:
+        task-definition: ${{ steps.update-task-def.outputs.task-definition }}
+        cluster: fragments-cluster
+        service: fragments-service
+        wait-for-service-stability: true
