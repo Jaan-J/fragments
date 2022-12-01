@@ -87,8 +87,9 @@ jobs:
         run: npm install
       - name: Build Containers
         run: docker-compose up -d
+      - name: Make script executable
+        run: chmod +x ./scripts/local-aws-setup.sh
       - name: Setup Local AWS Resources
-        $ chmod +x ./scripts/local-aws-setup.sh
         run: ./scripts/local-aws-setup.sh
       - name: Run Hurl Tests
         run: 'npm run test:integration'
