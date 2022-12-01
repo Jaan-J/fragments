@@ -1,20 +1,17 @@
-const { Fragment } = require('../../src/model/fragment');
+const Fragment = require('../../src/model/fragment');
 
 // Wait for a certain number of ms. Returns a Promise.
 const wait = async (ms = 10) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const validTypes = [
   `text/plain`,
-  /*
-   Currently, only text/plain is supported. Others will be added later.
   `text/markdown`,
   `text/html`,
   `application/json`,
-  `image/png`,
-  `image/jpeg`,
-  `image/webp`,
-  `image/gif`,
-  */
+  // `image/png`,
+  // `image/jpeg`,
+  // `image/webp`,
+  // `image/gif`,
 ];
 
 describe('Fragment class', () => {

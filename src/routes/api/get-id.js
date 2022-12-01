@@ -1,47 +1,46 @@
 // src/routes/api/get-id.js
-const { createErrorResponse, createSuccessResponse } = require('../../response');
-const {Fragment} = require('../../model/fragment');
+const { createErrorResponse } = require('../../response');
+const logger = require('../../logger');
+const Fragment = require('../../model/fragment');
 const path = require('path');
-var md = require('markdown-it')();
 
 module.exports = async (req, res) => {
   try {
+    const ownerId = req.user;
+    const id = path.parse(req.params.id).name;
     const ext = path.parse(req.params.id).ext.slice(1);
+
+    const fragment = new Fragment(await Fragment.byId(ownerId, id));
+    const fragmentData = await fragment.getData();
+
     if (ext) {
-      console.log(ext);
-      const paramID = req.params.id.split('.')[0];
-        const fragment = await Fragment.byId(req.user, paramID);
-        if(ext!='html'){
-          return res.status(415).json(createErrorResponse(415, 'This extension conversion is not supported.'));
-        }
-        let htmlRender = md.render(fragment.data.toString());
-        //if html render ends with a newline, remove it
-        if (htmlRender.endsWith('\n')) {
-          htmlRender = htmlRender.slice(0, -1);
-        }
-        res.set({
-          'Content-Type': 'text/html',
-        })
-        res.status(200).json(createSuccessResponse({
-          fragment: {
-            // 'Content-Type': 'text/html',
-            'Content-Length': fragment.size,
-            data : htmlRender
-          }
-        }));
+      logger.debug({ id: id, ext: ext }, 'GET /fragments/:id.ext');
+
+      if (!Fragment.isUseableExtension(ext)) {
+        return res.status(415).json(createErrorResponse(415, 'Extension type is not supported.'));
+      }
+
+      const type = await Fragment.isValidExtType(ext); // html -> text/html
+
+      if (!fragment.formats.includes(type)) {
+        return res.status(415).json(createErrorResponse(415, 'Conversion is not allowed.'));
+      }
+
+      const newFragmentData = await fragment.convertFragment(fragmentData, type);
+      logger.debug(
+        { newFragmentData: newFragmentData, contentType: type },
+        'New fragment data and content type'
+      );
+      res.setHeader('Content-type', type);
+      res.setHeader('Location', `${process.env.API_URL}/v1/fragments/${fragment.id}`);
+      res.status(200).send(newFragmentData);
       return;
     }
-  } catch (error) {
-    res.status(404).json(createErrorResponse(404, error.message));
-  }
-  try{
-      const fragment = await Fragment.byId(req.user, req.params.id);
-      const data = fragment.data.toString();
-      res.set({
-        'Content-Type': fragment.type,
-        'Content-Length': fragment.size,
-      })
-      res.status(200).json(createSuccessResponse({data}));
+    logger.debug({ fragment }, 'GET /fragments/:id');
+    res.setHeader('Location', `${process.env.API_URL}/v1/fragments/${fragment.id}`);
+    res.setHeader('content-type', fragment.type);
+    res.status(200).send(fragmentData);
+    return;
   } catch (error) {
     res.status(404).json(createErrorResponse(404, error.message));
   }

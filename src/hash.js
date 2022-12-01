@@ -13,7 +13,6 @@
  * Use .slice(0, 8) if you want reduce the size.
  */
 
- const crypto = require('crypto');
+const crypto = require('crypto');
 
- module.exports = (email) => crypto.createHash('sha256').update(email).digest('hex');
- 
+module.exports = (email) => crypto.createHash('sha256').update(email).digest('hex');

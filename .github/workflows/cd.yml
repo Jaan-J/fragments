@@ -94,7 +94,9 @@ jobs:
          AWS_ACCESS_KEY_ID=${{secrets.AWS_ACCESS_KEY_ID}}
          AWS_SECRET_ACCESS_KEY=${{secrets.AWS_SECRET_ACCESS_KEY}}
          AWS_SESSION_TOKEN=${{secrets.AWS_SESSION_TOKEN}}
-         API_URL=http://ec2co-ecsel-1cl255r0he7hv-266276072.us-east-1.elb.amazonaws.com:8080
+         API_URL=http://ec2co-ecsel-1vhqhc35ld19b-1002846953.us-east-1.elb.amazonaws.com:8080
+         AWS_COGNITO_HOSTED_UI_DOMAIN=fragments-jaan.auth.us-east-1.amazoncognito.com
+         AWS_REGION=us-east-1
 
     - name: Deploy Amazon ECS task definition
       uses: aws-actions/amazon-ecs-deploy-task-definition@v1

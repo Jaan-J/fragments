@@ -1,52 +1,31 @@
 const { createSuccessResponse, createErrorResponse } = require('../../response');
-const { Fragment } = require('../../model/fragment.js');
-const contentType = require('content-type');
-
+const Fragment = require('../../model/fragment');
+const logger = require('../../logger');
 const API_URL = process.env.API_URL || 'http://localhost:8080';
 
 // Support sending various Content-Types on the body up to 5M in size
 module.exports = async (req, res) => {
-  const { type } = contentType.parse(req);
-  // if (Object.keys(req.body).length === 0) {
-  //   //check to see if type is supported
-  //   // if (!Fragment.isSupportedType(type)) {
-  //   //   res.status(415).json(createErrorResponse('Improper Content-Type'));
-  //   //   return;
-  //   // }
-  //   throw new Error('No body provided');
-  // }
-
-    if (!Fragment.isSupportedType(type)) {
-      res.status(415).json(createErrorResponse('Improper Content-Type'));
-      return;
+  try {
+    if (!Fragment.isSupportedType(req.headers['content-type'])) {
+      return res.status(415).json(createErrorResponse(415, 'type is not supported!'));
     }
-  // check to see if the type is supported
-  const metadata = {
-    ownerId: req.user,
-    type,
-    created: new Date().toISOString(),
-    updated: new Date().toISOString(),
-    size: req.body.length,
-    data: req.body,
-  };
-  const fragments = new Fragment(metadata);
-  await fragments.save();
-  await fragments.setData(req.body);
-  if (Buffer.isBuffer(req.body)) {
-    res.location(`${API_URL}/v1/fragments/${fragments.id}`);
-    res.status(201).json(
-      createSuccessResponse({
-        fragment: {
-          id: fragments.id,
-          ownerId: fragments.ownerId,
-          type: fragments.type,
-          size: fragments.size,
-          created: fragments.created,
-          updated: fragments.updated,
-        },
-      })
-    );
-  } else {
-    res.json(createErrorResponse(415, 'Improper Content-Type'));
+
+    const fragment = new Fragment({
+      ownerId: req.user,
+      type: req.headers['content-type'],
+      size: Buffer.byteLength(req.body),
+      created: new Date(),
+      updated: new Date(),
+    });
+
+    await fragment.save();
+    await fragment.setData(req.body);
+
+    logger.debug({ fragment }, 'POST /fragments');
+
+    res.location(`${API_URL}/v1/fragments/${fragment.id}`);
+    res.status(201).json(createSuccessResponse({ fragment }));
+  } catch (error) {
+    res.status(500).json(createErrorResponse(500, error.message));
   }
 };

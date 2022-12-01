@@ -31,8 +31,8 @@ module.exports.createErrorResponse = function (code, message) {
   return {
     status: 'error',
     error: {
-      code,
-      message,
+      code: code,
+      message: message,
     },
   };
 };

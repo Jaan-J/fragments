@@ -3,7 +3,7 @@
 /**
  * The main entry-point for the v1 version of the fragments API.
  */
-const { Fragment } = require('../../model/fragment.js');
+const Fragment = require('../../model/fragment');
 const contentType = require('content-type');
 const express = require('express');
 

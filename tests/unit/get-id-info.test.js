@@ -2,19 +2,17 @@ const request = require('supertest');
 const app = require('../../src/app');
 
 describe('GET /v1/fragments/:id/info', () => {
-  // If the request is missing the Authorization header, it should be forbidden
   test('unauthenticated requests are denied', () =>
     request(app).get('/v1/fragments/id/info').expect(401));
 
-  // If the wrong username/password pair are used (no such user), it should be forbidden
   test('incorrect credentials are denied', () =>
     request(app)
       .get('/v1/fragments/:id/info')
-      .auth('invalid@email.com', 'incorrect_password')
+      .auth('invalid@email.com', 'not_the_password')
       .expect(401));
 
   test('metadata of posted fragment can be retrieved by id', async () => {
-    const postResponse = await request(app)
+    const postFragment = await request(app)
       .post('/v1/fragments')
       .auth('user1@email.com', 'password1')
       .set({
@@ -22,17 +20,17 @@ describe('GET /v1/fragments/:id/info', () => {
         body: 'This is a fragment',
       });
 
-    const getResponse = await request(app)
-      .get(`/v1/fragments/${postResponse.body.fragment.id}/info`)
+    const fetchedFragment = await request(app)
+      .get(`/v1/fragments/${postFragment.body.fragment.id}/info`)
       .auth('user1@email.com', 'password1');
 
-    expect(getResponse.statusCode).toBe(200);
-    expect(getResponse.body.status).toBe('ok');
+    expect(fetchedFragment.statusCode).toBe(200);
+    expect(fetchedFragment.body.status).toBe('ok');
   });
 
-  test('requested fragment metadata by invalid id should fail', async () => {
+  test('requesting fragments IDs that dont exist should return a 404', async () => {
     const res = await request(app)
-      .get(`/v1/fragments/randomId/info`)
+      .get(`/v1/fragments/FakeFragmentID/info`)
       .auth('user1@email.com', 'password1');
 
     expect(res.statusCode).toBe(404);

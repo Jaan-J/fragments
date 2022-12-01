@@ -10,7 +10,7 @@ describe('DELETE /fragments/:id', () => {
     request(app).get('/v1/fragments').auth('invalid@email.com', 'incorrect_password').expect(401));
 
   test('authenticated users can delete a fragment', async () => {
-    const postResponse = await request(app)
+    const postFragment = await request(app)
       .post('/v1/fragments')
       .auth('user1@email.com', 'password1')
       .set({
@@ -18,15 +18,15 @@ describe('DELETE /fragments/:id', () => {
         body: 'This is a fragment',
       });
 
-    const getResponse = await request(app)
-      .get(`/v1/fragments/${postResponse.body.fragment.id}/info`)
+    const fetchedFragment = await request(app)
+      .get(`/v1/fragments/${postFragment.body.fragment.id}/info`)
       .auth('user1@email.com', 'password1');
 
-    expect(getResponse.statusCode).toBe(200);
-    expect(getResponse.body.status).toBe('ok');
+    expect(fetchedFragment.statusCode).toBe(200);
+    expect(fetchedFragment.body.status).toBe('ok');
 
     const deleteResponse = await request(app)
-      .delete(`/v1/fragments/${postResponse.body.fragment.id}`)
+      .delete(`/v1/fragments/${postFragment.body.fragment.id}`)
       .auth('user1@email.com', 'password1');
 
     expect(deleteResponse.body.status).toBe('ok');
@@ -38,9 +38,9 @@ describe('DELETE /fragments/:id', () => {
     expect(getAllResponse.body.fragments).toEqual([]);
   });
 
-  test('If the id is not found, returns  status code 404 with an error message', async () => {
+  test('requesting fragments IDs that dont exist should return a 404', async () => {
     const deleteResponse = await request(app)
-      .delete(`/v1/fragments/randomId`)
+      .delete(`/v1/fragments/FakeFragmentID`)
       .auth('user1@email.com', 'password1');
 
     expect(deleteResponse.statusCode).toBe(404);

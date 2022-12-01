@@ -14,27 +14,22 @@ const {
   deleteFragment,
 } = require('./data');
 
-const validTypes = {
+const validFileTypes = {
   txt: 'text/plain',
   txtCharset: 'text/plain; charset=utf-8',
   md: 'text/markdown',
   html: 'text/html',
   json: 'application/json',
-  png: 'image/png',
-  jpg: 'image/jpeg',
-  webp: 'image/webp',
-  gif: 'image/gif',
 };
 
 class Fragment {
-  constructor({ id, ownerId, created, updated, type, size = 0, data }) {
+  constructor({ id, ownerId, created, updated, type, size = 0 }) {
     this.id = id || randomUUID();
     this.ownerId = ownerId;
-    this.created = created || new Date();
-    this.updated = updated || new Date();
+    this.created = created || new Date().toISOString();
+    this.updated = updated || new Date().toISOString();
     this.type = type;
     this.size = size;
-    this.data = data;
 
     if (!ownerId) {
       throw new Error('No owner id provided');
@@ -76,7 +71,7 @@ class Fragment {
    */
   static async byId(ownerId, id) {
     const fragment = await readFragment(ownerId, id);
-    if (fragment == null) {
+    if (!fragment) {
       throw new Error('Fragment is null or undefined');
     }
     return fragment;
@@ -96,17 +91,17 @@ class Fragment {
    * Saves the current fragment to the database
    * @returns Promise
    */
-  save() {
+  async save() {
     this.updated = new Date().toISOString();
-    return writeFragment(this);
+    return await writeFragment(this);
   }
 
   /**
    * Gets the fragment's data from the database
    * @returns Promise<Buffer>
    */
-  getData() {
-    return readFragmentData(this.ownerId, this.id);
+  async getData() {
+    return await readFragmentData(this.ownerId, this.id);
   }
 
   /**
@@ -118,7 +113,7 @@ class Fragment {
     this.size = data.length;
     this.data = data;
     this.updated = new Date().toISOString();
-    await writeFragmentData(this.ownerId, this.id, data);
+    return await writeFragmentData(this.ownerId, this.id, data);
   }
 
   /**
@@ -136,17 +131,7 @@ class Fragment {
    * @returns {boolean} true if fragment's type is text/*
    */
   get isText() {
-    if (this.mimeType.startsWith('text/')) {
-      return true;
-    }
-    return false;
-  }
-
-  get isMarkdown() {
-    if (this.mimeType === 'text/markdown') {
-      return true;
-    }
-    return false;
+    return this.mimeType.includes('text');
   }
 
   /**
@@ -154,13 +139,25 @@ class Fragment {
    * @returns {Array<string>} list of supported mime types
    */
   get formats() {
-    if (this.isText) {
-      return ['text/plain'];
+    let mimeTypes = [];
+    switch (this.type) {
+      case validFileTypes.txt:
+      case validFileTypes.txtCharset:
+        mimeTypes = [validFileTypes.txt];
+        break;
+      case validFileTypes.md:
+        mimeTypes = [validFileTypes.md, validFileTypes.txt, validFileTypes.html];
+        break;
+      case validFileTypes.html:
+        mimeTypes = [validFileTypes.html, validFileTypes.txt];
+        break;
+      case validFileTypes.json:
+        mimeTypes = [validFileTypes.json, validFileTypes.txt];
+        break;
+      default:
+        mimeTypes = [];
     }
-    if (this.isMarkdown) {
-      return ['text/html'];
-    }
-    return [];
+    return mimeTypes;
   }
 
   /**
@@ -169,28 +166,18 @@ class Fragment {
    * @returns {boolean} true if we support this Content-Type (i.e., type/subtype)
    */
   static isSupportedType(value) {
-    const { type } = contentType.parse(value);
-    if (
-      type === 'text/plain' ||
-      type === 'text/plain; charset=utf-8' ||
-      type === 'text/markdown' ||
-      type === 'text/html' ||
-      type === 'application/json'
-    ) {
-      return true;
-    }
-    return false;
+    return Object.values(validFileTypes).includes(value);
   }
 
-  static isSupportedExt(value) {
-    return Object.keys(validTypes).includes(value);
+  static isUseableExtension(value) {
+    return Object.keys(validFileTypes).includes(value);
   }
 
-  static extValidType(ext) {
-    return validTypes[ext];
+  static isValidExtType(ext) {
+    return validFileTypes[ext];
   }
 
-  static convertData(fragmentData, conversionType) {
+  async convertFragment(fragmentData, conversionType) {
     switch (conversionType) {
       case 'text/plain':
         return fragmentData.toString();
@@ -201,7 +188,6 @@ class Fragment {
         return fragmentData;
     }
   }
-  
 }
 
-module.exports.Fragment = Fragment;
+module.exports = Fragment;
