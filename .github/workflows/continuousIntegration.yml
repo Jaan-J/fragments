@@ -52,6 +52,7 @@ jobs:
       - lint
       - dockerfile-lint
       - unit-tests
+      - integration-tests
     runs-on: ubuntu-latest
     steps:
       - name: Set up Docker Buildx
