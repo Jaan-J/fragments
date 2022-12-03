@@ -160,8 +160,14 @@ class Fragment {
         mimeTypes = [validFileTypes.json, validFileTypes.txt];
         break;
       case validFileTypes.png:
+        mimeTypes = [validFileTypes.png, validFileTypes.jpg, validFileTypes.webp, validFileTypes.gif];
+        break;
       case validFileTypes.jpg:
+        mimeTypes = [validFileTypes.png, validFileTypes.jpg, validFileTypes.webp, validFileTypes.gif];
+        break;
       case validFileTypes.gif:
+        mimeTypes = [validFileTypes.png, validFileTypes.jpg, validFileTypes.webp, validFileTypes.gif];
+        break;
       case validFileTypes.webp:
         mimeTypes = [validFileTypes.png, validFileTypes.jpg, validFileTypes.webp, validFileTypes.gif];
         break;
@@ -196,13 +202,13 @@ class Fragment {
         if (this.type === 'text/markdown') return md.render(fragmentData.toString());
         return fragmentData;
       case 'image/png':
-        return await sharp(fragmentData).png().toBuffer();
+        return await sharp(fragmentData).png();
       case 'image/jpeg':
-        return await sharp(fragmentData).jpeg().toBuffer();
+        return await sharp(fragmentData).jpeg();
       case 'image/gif':
-        return await sharp(fragmentData).gif().toBuffer();
+        return await sharp(fragmentData).gif();
       case 'image/webp':
-        return await sharp(fragmentData).webp().toBuffer();
+        return await sharp(fragmentData).webp();
       default:
         return fragmentData;
     }
