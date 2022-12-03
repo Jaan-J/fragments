@@ -20,7 +20,7 @@ module.exports = async (req, res) => {
         return res.status(415).json(createErrorResponse(415, 'Extension type is not supported.'));
       }
 
-      const type = await Fragment.isValidExtType(ext); // html -> text/html
+      const type = await Fragment.isValidExtType(ext);
 
       if (!fragment.formats.includes(type)) {
         return res.status(415).json(createErrorResponse(415, 'Conversion is not allowed.'));
