@@ -4,6 +4,7 @@ const { randomUUID } = require('crypto');
 // Use https://www.npmjs.com/package/content-type to create/parse Content-Type headers
 const contentType = require('content-type');
 var md = require('markdown-it')();
+const sharp = require('sharp');
 // Functions for working with fragment metadata/data using our DB
 const {
   readFragment,
@@ -20,6 +21,10 @@ const validFileTypes = {
   md: 'text/markdown',
   html: 'text/html',
   json: 'application/json',
+  png: 'image/png',
+  jpg: 'image/jpeg',
+  webp: 'image/webp',
+  gif: 'image/gif',
 };
 
 class Fragment {
@@ -154,6 +159,12 @@ class Fragment {
       case validFileTypes.json:
         mimeTypes = [validFileTypes.json, validFileTypes.txt];
         break;
+      case validFileTypes.png:
+      case validFileTypes.jpg:
+      case validFileTypes.gif:
+      case validFileTypes.webp:
+        mimeTypes = [validFileTypes.png, validFileTypes.jpg, validFileTypes.webp, validFileTypes.gif];
+        break;
       default:
         mimeTypes = [];
     }
@@ -184,6 +195,14 @@ class Fragment {
       case 'text/html':
         if (this.type === 'text/markdown') return md.render(fragmentData.toString());
         return fragmentData;
+      case 'image/png':
+        return await sharp(fragmentData).png().toBuffer();
+      case 'image/jpeg':
+        return await sharp(fragmentData).jpeg().toBuffer();
+      case 'image/gif':
+        return await sharp(fragmentData).gif().toBuffer();
+      case 'image/webp':
+        return await sharp(fragmentData).webp().toBuffer();
       default:
         return fragmentData;
     }
