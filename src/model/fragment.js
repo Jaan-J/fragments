@@ -194,23 +194,23 @@ class Fragment {
     return validFileTypes[ext];
   }
 
-  async convertFragment(fragmentData, conversionType) {
+  async convertFragment(fragData, conversionType) {
     switch (conversionType) {
       case 'text/plain':
-        return fragmentData.toString();
+        return fragData.toString();
       case 'text/html':
-        if (this.type === 'text/markdown') return md.render(fragmentData.toString());
-        return fragmentData;
+        if (this.type === 'text/markdown') return md.render(fragData.toString());
+        return fragData;
       case 'image/png':
-        return await sharp(fragmentData).png();
+        return await sharp(fragData).png();
       case 'image/jpeg':
-        return await sharp(fragmentData).jpeg();
+        return await sharp(fragData).jpeg();
       case 'image/gif':
-        return await sharp(fragmentData).gif();
+        return await sharp(fragData).gif();
       case 'image/webp':
-        return await sharp(fragmentData).webp();
+        return await sharp(fragData).webp();
       default:
-        return fragmentData;
+        return fragData;
     }
   }
 }
