@@ -20,7 +20,7 @@
 
 ## Introduction
 
-Fragments Microservice is a cloud-based application that allows authenticated users to create, read, update, and delete data on the cloud. This microservice utilizes AWS services such as ECR, ECS, EC2, S3, Cognito, and DynamoDB. 
+The Fragments Microservice is a cloud-based application that enables authenticated users to perform CRUD operations on cloud-stored data. Developed with continuous integration and unit testing, this microservice utilizes a range of AWS Cloud Services, including ECR, ECS, EC2, S3, Cognito, and DynamoDB, and is fully integrated with Docker.
 
 ## Overview
 
